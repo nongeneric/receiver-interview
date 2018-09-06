@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "-ggdb -Wall -Wextra -Werror -Wno-implicit-fallthrough ${CMAKE_CXX_FLAGS}")
 
 add_library(receiver
+    IReceiver.h
     Receiver.h
     Receiver.cpp
 )
