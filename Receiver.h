@@ -10,15 +10,15 @@ enum class StreamType {
 
 class Receiver : public IReceiver {
     ICallback* _callback;
-    StreamType _activeStreamType = StreamType::None;
+    StreamType _activeStreamType;
     std::vector<char> _packet;
-    uint32_t _bytesRead = 0;
-    uint32_t _binaryLeft = 0;
-    uint32_t _binaryHeaderLeft = 0;
-    uint32_t _textEndingSize = 0;
+    uint32_t _bytesRead;
+    uint32_t _binaryLeft;
+    uint32_t _binaryHeaderLeft;
 
-    void receiveBinary(const char* data, unsigned int size);
-    void receiveText(const char* data, unsigned int size);
+    void reset();
+    const char* receiveBinary(const char* data, unsigned int& size);
+    const char* receiveText(const char* data, unsigned int& size);
 
 public:
     Receiver(Receiver const&) = delete;

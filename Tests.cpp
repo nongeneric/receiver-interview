@@ -35,6 +35,15 @@ TEST_CASE("empty_binary") {
     REQUIRE( callback.binaries[0] == "" );
 }
 
+TEST_CASE("empty_text") {
+    TestCallback callback;
+    Receiver receiver(&callback);
+    receiver.Receive("\r\n\r\n", 4);
+    REQUIRE( callback.binaries.empty() );
+    REQUIRE( callback.texts.size() == 1 );
+    REQUIRE( callback.texts[0] == "" );
+}
+
 TEST_CASE("basic_text") {
     TestCallback callback;
     Receiver receiver(&callback);
@@ -103,7 +112,7 @@ TEST_CASE("complex_chunked_mixed") {
     REQUIRE( callback.texts.size() == 3 );
     REQUIRE( callback.texts[0] == "text1" );
     REQUIRE( callback.texts[1] == "text2" );
-    REQUIRE( callback.texts[2] == "text3\r\n\r\r\n" );
+    REQUIRE( callback.texts[2] == "text3\r\n\r" );
 }
 
 TEST_CASE("binary_prefix_inside_text") {
@@ -115,4 +124,21 @@ TEST_CASE("binary_prefix_inside_text") {
     REQUIRE( callback.binaries.empty() );
     REQUIRE( callback.texts.size() == 1 );
     REQUIRE( callback.texts[0] == "text with $ in it" );
+}
+
+TEST_CASE("long_binary") {
+    TestCallback callback;
+    Receiver receiver(&callback);
+    std::vector<char> data { *BINARY_PREFIX, 0x00, 0x10, 0x20, 0x30 };
+    for (int i = 0; i < 0x102030; ++i) {
+        data.push_back(i);
+    }
+
+    receiver.Receive(&data[0], std::size(data));
+
+    REQUIRE( callback.binaries.size() == 1 );
+    REQUIRE( callback.texts.empty() );
+    auto& binary = callback.binaries[0];
+    REQUIRE( binary.size() == 0x102030 );
+    REQUIRE( std::equal(begin(data) + 5, end(data), begin(binary), end(binary)) );
 }
