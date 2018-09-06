@@ -35,7 +35,7 @@ const char* Receiver::receiveBinary(const char* data, unsigned int& size) {
     size -= toRead;
     data += toRead;
     if (_binaryLeft == 0) {
-        _callback->BinaryPacket(&_packet[0], _packet.size());
+        _callback->BinaryPacket(_packet.data(), _packet.size());
         reset();
         return data;
     }
